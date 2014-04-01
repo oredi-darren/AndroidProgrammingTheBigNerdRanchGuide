@@ -28,11 +28,21 @@
                 android:text="@string/false_button"
                 android:id="@+id/false_button" />
     </LinearLayout>
-    <Button
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/next_button"
-            android:drawableRight="@drawable/arrow_right"
-            android:drawablePadding="4dp"
-            android:id="@+id/next_button" />
+            android:contentDescription="@string/previous_button"
+            android:src="@drawable/arrow_left"
+            android:id="@+id/previous_button" />
+        <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/next_button"
+                android:src="@drawable/arrow_right"
+                android:id="@+id/next_button" />
+    </LinearLayout>
 </LinearLayout>

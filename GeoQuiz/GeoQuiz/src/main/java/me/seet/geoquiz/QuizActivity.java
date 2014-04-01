@@ -6,14 +6,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
-
 
 public class QuizActivity extends ActionBarActivity {
     private Button mTrueButton;
     private Button mFalseButton;
-    private Button mNextButton;
+    private ImageButton mNextButton;
+    private ImageButton mPreviousButton;
     private TextView mQuestionTextView;
     private TrueFalse[] mQuestionBank = new TrueFalse[] {
         new TrueFalse(R.string.question_ocean, true),
@@ -30,6 +31,12 @@ public class QuizActivity extends ActionBarActivity {
         setContentView(R.layout.activity_quiz);
 
         mQuestionTextView = (TextView)findViewById(R.id.question_text_view);
+        mQuestionTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getQuestion(1);
+            }
+        });
         updateQuestion();
 
         mTrueButton = (Button)findViewById(R.id.true_button);
@@ -46,31 +53,21 @@ public class QuizActivity extends ActionBarActivity {
                 checkAnswer(false);
             }
         });
-        mNextButton = (Button)findViewById(R.id.next_button);
+        mNextButton = (ImageButton)findViewById(R.id.next_button);
         mNextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mCurrentIndex = (mCurrentIndex + 1) % mQuestionBank.length;
-                updateQuestion();
+                getQuestion(1);
             }
         });
 
-    }
-
-    private void checkAnswer(boolean userPressedTrue) {
-        boolean answerIsTrue = mQuestionBank[mCurrentIndex].isTrueQuestion();
-        int meesageResId = 0;
-        if(userPressedTrue == answerIsTrue)
-            meesageResId = R.string.correct_toast;
-        else
-            meesageResId = R.string.incorrect_toast;
-
-        Toast.makeText(this, meesageResId, Toast.LENGTH_SHORT).show();
-    }
-
-    private void updateQuestion() {
-        int question = mQuestionBank[mCurrentIndex].getQuestion();
-        mQuestionTextView.setText(question);
+        mPreviousButton = (ImageButton)findViewById(R.id.previous_button);
+        mPreviousButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getQuestion(-1);
+            }
+        });
     }
 
     @Override
@@ -93,4 +90,26 @@ public class QuizActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void getQuestion(int offset) {
+        mCurrentIndex += offset;                                           // Add offset + or - 1
+        if(mCurrentIndex < 0) mCurrentIndex = mQuestionBank.length - 1;    // check lower boundary
+        mCurrentIndex = mCurrentIndex % mQuestionBank.length;              // check upper boundary
+        updateQuestion();
+    }
+
+    private void checkAnswer(boolean userPressedTrue) {
+        boolean answerIsTrue = mQuestionBank[mCurrentIndex].isTrueQuestion();
+        int messageResId = 0;
+        if(userPressedTrue == answerIsTrue)
+            messageResId = R.string.correct_toast;
+        else
+            messageResId = R.string.incorrect_toast;
+
+        Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show();
+    }
+
+    private void updateQuestion() {
+        int question = mQuestionBank[mCurrentIndex].getQuestion();
+        mQuestionTextView.setText(question);
+    }
 }
