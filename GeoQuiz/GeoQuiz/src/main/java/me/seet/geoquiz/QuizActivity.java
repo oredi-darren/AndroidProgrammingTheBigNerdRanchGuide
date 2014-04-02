@@ -14,7 +14,8 @@ import android.widget.Toast;
 
 public class QuizActivity extends ActionBarActivity {
     private static final String TAG = "QuizActivity";
-    private static final String KEY_INDEX = "index";
+    private static final String PERSISTENT_INDEX = "index";
+    private static final String DATA_INDEX = "data";
 
     private Button mTrueButton;
     private Button mFalseButton;
@@ -22,27 +23,29 @@ public class QuizActivity extends ActionBarActivity {
     private ImageButton mPreviousButton;
     private Button mCheatButton;
     private TextView mQuestionTextView;
-    private TrueFalse[] mQuestionBank = new TrueFalse[] {
-        new TrueFalse(R.string.question_ocean, true),
-        new TrueFalse(R.string.question_mideast, false),
-        new TrueFalse(R.string.question_africa, false),
-        new TrueFalse(R.string.question_americas, true),
-        new TrueFalse(R.string.question_asia, true)
-    };
+    private TrueFalse[] mQuestionBank;
     private int mCurrentIndex = 0;
-    private boolean mIsCheater;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // Called when activity is initially created, goes into Created state
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate(Bundle) called");
-        if(savedInstanceState != null) {
-            // restore from bundle
-            mCurrentIndex = savedInstanceState.getInt(KEY_INDEX);
-        }
         setContentView(R.layout.activity_quiz);
 
+        if(savedInstanceState != null) {
+            // restore from bundle
+            mCurrentIndex = savedInstanceState.getInt(PERSISTENT_INDEX);
+            mQuestionBank = (TrueFalse[])savedInstanceState.getSerializable(DATA_INDEX);
+        } else {
+            mQuestionBank = new TrueFalse[] {
+                    new TrueFalse(R.string.question_ocean, true),
+                    new TrueFalse(R.string.question_mideast, false),
+                    new TrueFalse(R.string.question_africa, false),
+                    new TrueFalse(R.string.question_americas, true),
+                    new TrueFalse(R.string.question_asia, true)
+            };
+        }
         mQuestionTextView = (TextView)findViewById(R.id.question_text_view);
         mQuestionTextView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -141,7 +144,8 @@ public class QuizActivity extends ActionBarActivity {
         // Used to persist data across configuration changes
         super.onSaveInstanceState(outState);
         Log.d(TAG, "onSaveInstanceState() called");
-        outState.putInt(KEY_INDEX, mCurrentIndex);
+        outState.putInt(PERSISTENT_INDEX, mCurrentIndex);
+        outState.putSerializable(DATA_INDEX, mQuestionBank);
     }
 
     @Override
@@ -168,12 +172,10 @@ public class QuizActivity extends ActionBarActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(data == null)
             return;
-
-        mIsCheater = data.getBooleanExtra(CheatActivity.EXTRA_ANSWER_SHOWN, false);
+        mQuestionBank[mCurrentIndex].setCheater(data.getBooleanExtra(CheatActivity.EXTRA_ANSWER_SHOWN, false));
     }
 
     private void getQuestion(int offset) {
-        mIsCheater = false;
         mCurrentIndex += offset;                                           // Add offset + or - 1
         if(mCurrentIndex < 0) mCurrentIndex = mQuestionBank.length - 1;    // check lower boundary
         mCurrentIndex = mCurrentIndex % mQuestionBank.length;              // check upper boundary
@@ -181,12 +183,12 @@ public class QuizActivity extends ActionBarActivity {
     }
 
     private void checkAnswer(boolean userPressedTrue) {
-        boolean answerIsTrue = mQuestionBank[mCurrentIndex].isTrueQuestion();
-        int messageResId = 0;
-        if (mIsCheater) {
+        TrueFalse question = mQuestionBank[mCurrentIndex];
+        int messageResId;
+        if (question.isCheater()) {
             messageResId = R.string.judgment_toast;
         } else {
-            if(userPressedTrue == answerIsTrue)
+            if(userPressedTrue == question.isTrueQuestion())
                 messageResId = R.string.correct_toast;
             else
                 messageResId = R.string.incorrect_toast;
