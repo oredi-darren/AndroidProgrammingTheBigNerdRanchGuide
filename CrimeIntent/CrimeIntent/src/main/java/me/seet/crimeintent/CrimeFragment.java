@@ -2,8 +2,10 @@ package me.seet.crimeintent;
 
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.Editable;
@@ -28,8 +30,12 @@ import java.util.UUID;
  */
 public class CrimeFragment extends Fragment {
     public static final String EXTRA_CRIME_ID = "me.seet.criminalintent.crime_id";
-    private static final String DIALOG_DATE = "date";
-    private static final int REQUEST_DATE = 0;
+    public static final String DIALOG_DATETIME_CHOICE = "datetime_choice";
+    public static final String DIALOG_DATE = "date";
+    public static final String DIALOG_TIME = "time";
+    private static final int REQUEST_DATETIME_CHOICE = 0;
+    private static final int REQUEST_DATE = 1;
+    private static final int REQUEST_TIME = 2;
 
     private Crime mCrime;
     private EditText mTitleField;
@@ -84,12 +90,11 @@ public class CrimeFragment extends Fragment {
         mDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FragmentManager fm = getActivity().getSupportFragmentManager();
-                DatePickerFragment dialog = DatePickerFragment.newInstance(mCrime.getDate());
-                dialog.setTargetFragment(CrimeFragment.this, REQUEST_DATE);
-                dialog.show(fm, DIALOG_DATE);
+                DateTimeChoiceFragment dialog = new DateTimeChoiceFragment();
+                showDialogFragment(dialog, REQUEST_DATETIME_CHOICE, DIALOG_DATETIME_CHOICE);
             }
         });
+
 
         mSolvedCheckBox = (CheckBox)v.findViewById(R.id.crime_solved);
         mSolvedCheckBox.setChecked(mCrime.isSolved());
@@ -103,18 +108,45 @@ public class CrimeFragment extends Fragment {
         return v;
     }
 
+    private void showDialogFragment(DialogFragment dialog, int requestCode, String dialogName) {
+        FragmentManager fm = getActivity().getSupportFragmentManager();
+        dialog.setTargetFragment(this, requestCode);
+        dialog.show(fm, dialogName);
+    }
+
     private void updateDate() {
-        DateFormat df = new SimpleDateFormat("EEEE, MMM d yyyy");
+        DateFormat df = new SimpleDateFormat("EEEE, MMM d yyyy hh:mm a");
         mDateButton.setText(df.format(mCrime.getDate()));
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode != Activity.RESULT_OK) return;
-        if(requestCode == REQUEST_DATE) {
-            Date date = (Date)data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
-            mCrime.setDate(date);
-            updateDate();
+
+        switch (requestCode) {
+            case REQUEST_DATETIME_CHOICE:
+                DialogFragment dialog;
+                String choiceResult = (String)data.getSerializableExtra(DateTimeChoiceFragment.EXTRA_DATETIME_CHOICE);
+                if(choiceResult == DIALOG_DATE) {
+                    dialog = DatePickerFragment.newInstance(mCrime.getDate());
+                    showDialogFragment(dialog, REQUEST_DATE, DIALOG_DATE);
+                } else if (choiceResult == DIALOG_TIME) {
+                    dialog = TimePickerFragment.newInstance(mCrime.getDate());
+                    showDialogFragment(dialog, REQUEST_TIME, DIALOG_TIME);
+                }
+                break;
+            case REQUEST_DATE:
+                Date dateResult = (Date)data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
+                mCrime.setDate(dateResult);
+                updateDate();
+                break;
+            case REQUEST_TIME:
+                Date timeResult = (Date)data.getSerializableExtra(TimePickerFragment.EXTRA_TIME);
+                mCrime.setDate(timeResult);
+                updateDate();
+                break;
+            default:
+                break;
         }
     }
 }
