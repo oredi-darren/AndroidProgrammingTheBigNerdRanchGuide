@@ -4,13 +4,13 @@
              android:layout_width="match_parent"
              android:layout_height="match_parent">
 
-    <SurfaceView
+    <ImageView
+            android:src="@drawable/armstrong_on_moon"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerInside"
             android:layout_weight="1"
-            android:id="@+id/hellomoon_surfaceView"/>
-
+            />
     <TableRow
             android:gravity="center|bottom"
             android:layout_weight="0">
@@ -18,19 +18,12 @@
         <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="@string/hellomoon_play"
                 android:id="@+id/hellomoon_playButton"/>
         <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="@string/hellomoon_stop"
                 android:id="@+id/hellomoon_stopButton"/>
-        <Button android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/hellomoon_pause"
-                android:id="@+id/hellomoon_pauseButton"/>
     </TableRow>
 </TableLayout>
