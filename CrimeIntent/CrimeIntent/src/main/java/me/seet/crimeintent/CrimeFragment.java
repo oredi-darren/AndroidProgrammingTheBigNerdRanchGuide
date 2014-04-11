@@ -133,6 +133,12 @@ public class CrimeFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        CrimeLab.get(getActivity()).saveCrimes();
+    }
+
     private void showDialogFragment(DialogFragment dialog, int requestCode, String dialogName) {
         FragmentManager fm = getActivity().getSupportFragmentManager();
         dialog.setTargetFragment(this, requestCode);

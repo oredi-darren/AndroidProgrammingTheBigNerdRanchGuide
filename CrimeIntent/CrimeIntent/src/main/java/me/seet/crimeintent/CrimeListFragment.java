@@ -1,5 +1,6 @@
 package me.seet.crimeintent;
 
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -74,6 +75,7 @@ public class CrimeListFragment extends ListFragment {
         }
     }
 
+    @TargetApi(11)
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {

@@ -19,6 +19,7 @@ public class DateTimeChoiceFragment extends DialogFragment {
     public static final String EXTRA_DATETIME_CHOICE = "me.seet.criminalintent.datetime_choice";
     private RadioButton mDateRadioButton;
     private RadioButton mTimeRadioButton;
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         View v = getActivity().getLayoutInflater().inflate(R.layout.dialog_datetime_choice, null);

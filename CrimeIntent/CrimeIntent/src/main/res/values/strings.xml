@@ -19,5 +19,9 @@
     <string name="subtitle">If you see something, say something.</string>
     <string name="delete_crime">Delete</string>
     <string name="crime_list_empty">There are no crimes</string>
+    <string name="manage_settings">Manage Settings</string>
+    <string name="storage_choice_title">Select to the storage location:</string>
+    <string name="internal_storage">Internal</string>
+    <string name="external_storage">External</string>
 
 </resources>
